@@ -1,0 +1,137 @@
+---
+title: "Assignment 8: R notebooks and gapminder w/ggplot"
+output: html_notebook
+---
+## Loading libraries
+```{r}
+library(gapminder)
+library(tidyverse)
+```
+
+## Creating a gapminder data frame
+```{r}
+data("gapminder")
+gapminder
+
+summary(gapminder)
+```
+
+## Isolating a column "gdpPercap"
+```{r}
+x <- mean(gapminder$gdpPercap)
+x
+
+attach(gapminder)
+```
+
+## Getting median and plotting histogram of life expectancy
+```{r}
+median(pop)
+
+hist(lifeExp)
+hist(pop) 
+hist(log(pop))
+```
+
+## Boxplots
+```{r}
+boxplot(lifeExp ~ continent)
+plot(lifeExp ~ gdpPercap)
+plot(lifeExp ~ log(gdpPercap))
+```
+
+## New naming for the dataframe and getting median
+```{r}
+mygap <- gapminder
+summary(mygap)
+x_mygap <- mean(mygap$gdpPercap)
+median(mygap$pop)
+```
+
+## Histograms
+```{r}
+hist(mygap$lifeExp)
+hist(mygap$pop) 
+hist(log(mygap$pop))
+```
+
+## Boxplots
+```{r}
+boxplot(lifeExp ~ continent, data=mygap)
+plot(lifeExp ~ gdpPercap, data=mygap)
+plot(lifeExp ~ log(gdpPercap), data=mygap)
+```
+
+## dplyr manipulations and ggplots
+```{r}
+mygap %>%
+  select(country, lifeExp) %>% 
+  filter(country == "South Africa" |
+           country == "Ireland") %>% 
+  group_by(country) %>% 
+  summarise(Average_life = mean(lifeExp))
+```
+
+
+```{r}
+df1 <- gapminder %>%
+  select(country, lifeExp) %>% 
+  filter(country == "South Africa" |
+           country == "Ireland")
+```
+
+## t-test to compare the life expectancy between South Africa and Ireland
+```{r}
+t.test(data = df1, lifeExp ~ country)
+```
+
+## Basic scatterplot aka "geom_point" 
+```{r}
+mygap %>% 
+  filter(gdpPercap < 50000) %>% 
+  ggplot(aes(x=gdpPercap, y=lifeExp)) +
+  geom_point()
+```
+
+## Color-enhanced single plot
+```{r}
+mygap %>% 
+  filter(gdpPercap < 50000) %>% 
+  ggplot(aes(x=log(gdpPercap), y=lifeExp, col=continent, size=pop)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method=lm)
+```
+
+## Continent-faceted scatterplots
+```{r}
+mygap %>% 
+  filter(gdpPercap < 50000) %>% 
+  ggplot(aes(x=log(gdpPercap), y=lifeExp, col=year, size=pop)) +
+  geom_point(alpha=0.3) +
+  geom_smooth(method=lm) +
+  facet_wrap(~continent)
+```
+
+## Linear regression models
+```{r}
+lm(lifeExp ~ gdpPercap, data=mygap)
+```
+
+
+```{r}
+lm(lifeExp ~ gdpPercap, data=mygap) %>% 
+  summary
+```
+
+
+```{r}
+lm(lifeExp ~ gdpPercap+pop, data=mygap) %>% 
+  summary
+```
+
+
+```{r}
+lm(lifeExp ~ log(gdpPercap)+log(pop), data=mygap) %>% 
+  summary
+```
+
